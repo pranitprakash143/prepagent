@@ -234,7 +234,10 @@ async def get_payment_history(
 ):
     result = await db.execute(
         select(Payment)
-        .where(Payment.tenant_id == current_user.id)
+        .where(
+            Payment.tenant_id == current_user.id,
+            Payment.user_id == current_user.id,
+        )
         .order_by(Payment.created_at.desc())
         .limit(20)
     )

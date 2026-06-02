@@ -37,6 +37,7 @@ async def create_note(
 ):
     db_note = Note(
         tenant_id=current_user.id,
+        user_id=current_user.id,
         title=note.title,
         content=note.content,
         tags=serialize_tags(note.tags),
@@ -64,7 +65,10 @@ async def list_notes(
 ):
     stmt = (
         select(Note)
-        .where(Note.tenant_id == current_user.id)
+        .where(
+            Note.tenant_id == current_user.id,
+            Note.user_id == current_user.id,
+        )
         .order_by(Note.created_at.desc())
         .offset(skip)
         .limit(limit)
@@ -95,7 +99,10 @@ async def list_tags(
 ):
     stmt = (
         select(Note)
-        .where(Note.tenant_id == current_user.id)
+        .where(
+            Note.tenant_id == current_user.id,
+            Note.user_id == current_user.id,
+        )
         .order_by(Note.created_at.desc())
     )
     result = await db.execute(stmt)
@@ -113,7 +120,11 @@ async def get_note(
     current_user: User = Depends(get_current_user),
 ):
     result = await db.execute(
-        select(Note).where(Note.id == note_id, Note.tenant_id == current_user.id)
+        select(Note).where(
+            Note.id == note_id,
+            Note.tenant_id == current_user.id,
+            Note.user_id == current_user.id,
+        )
     )
     note = result.scalars().first()
     if note is None:
@@ -136,7 +147,11 @@ async def update_note(
     current_user: User = Depends(get_current_user),
 ):
     result = await db.execute(
-        select(Note).where(Note.id == note_id, Note.tenant_id == current_user.id)
+        select(Note).where(
+            Note.id == note_id,
+            Note.tenant_id == current_user.id,
+            Note.user_id == current_user.id,
+        )
     )
     note = result.scalars().first()
     if note is None:
@@ -168,7 +183,11 @@ async def delete_note(
     current_user: User = Depends(get_current_user),
 ):
     result = await db.execute(
-        select(Note).where(Note.id == note_id, Note.tenant_id == current_user.id)
+        select(Note).where(
+            Note.id == note_id,
+            Note.tenant_id == current_user.id,
+            Note.user_id == current_user.id,
+        )
     )
     note = result.scalars().first()
     if note is None:

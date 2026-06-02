@@ -34,11 +34,14 @@ async def search(
     seen_ids: set = set()
 
     if body.source in (None, "document"):
-        where_filter = None
+        where_filter = {
+            "tenant_id": current_user.id,
+            "user_id": current_user.id,
+        }
         if body.document_id:
-            where_filter = {"document_id": body.document_id}
+            where_filter["document_id"] = body.document_id
         elif body.subject_id:
-            where_filter = {"subject_id": body.subject_id}
+            where_filter["subject_id"] = body.subject_id
 
         chroma_results = await query_chroma(
             query, n_results=body.limit, where_filter=where_filter

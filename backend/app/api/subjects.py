@@ -42,7 +42,10 @@ async def list_subjects(
 ):
     result = await db.execute(
         select(Subject)
-        .where(Subject.tenant_id == str(current_user.id))
+        .where(
+            Subject.tenant_id == str(current_user.id),
+            Subject.user_id == str(current_user.id),
+        )
         .offset(skip)
         .limit(limit)
     )
@@ -77,6 +80,7 @@ async def create_subject(
     subject = Subject(
         id=str(uuid4()),
         tenant_id=str(current_user.id),
+        user_id=str(current_user.id),
         name=subject_in.name,
     )
     if subject_in.description:
@@ -105,6 +109,7 @@ async def get_subject(
         select(Subject).where(
             Subject.id == subject_id,
             Subject.tenant_id == str(current_user.id),
+            Subject.user_id == str(current_user.id),
         )
     )
     subject = result.scalars().first()
@@ -131,6 +136,7 @@ async def update_subject(
         select(Subject).where(
             Subject.id == subject_id,
             Subject.tenant_id == str(current_user.id),
+            Subject.user_id == str(current_user.id),
         )
     )
     subject = result.scalars().first()
@@ -141,6 +147,7 @@ async def update_subject(
         existing = await db.execute(
             select(Subject).where(
                 Subject.tenant_id == str(current_user.id),
+                Subject.user_id == str(current_user.id),
                 Subject.name == subject_in.name,
                 Subject.id != subject_id,
             )
@@ -174,6 +181,7 @@ async def delete_subject(
         select(Subject).where(
             Subject.id == subject_id,
             Subject.tenant_id == str(current_user.id),
+            Subject.user_id == str(current_user.id),
         )
     )
     subject = result.scalars().first()
