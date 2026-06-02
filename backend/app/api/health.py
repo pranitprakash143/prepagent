@@ -55,11 +55,9 @@ async def _check_pgvector() -> str:
 
 async def _check_embedding_model() -> str:
     try:
-        from sentence_transformers import SentenceTransformer
-        from app.core.config import settings
+        from app.services.embedding_service import embed_texts
 
-        model = SentenceTransformer(settings.EMBEDDING_MODEL)
-        _ = model.encode(["health check"])
+        _ = embed_texts(["health check"])
         return "healthy"
     except Exception as exc:
         logger.warning("Embedding model health check failed: %s", exc)

@@ -33,7 +33,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     container_name: prepagent-backend
     environment:
       DATABASE_URL: postgresql+asyncpg://${DB_USER:-prepagent}:${DB_PASSWORD:-prepagent_dev}@postgres:5432/${DB_NAME:-prepagent_db}
@@ -50,6 +50,12 @@ services:
       RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
       RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
       RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET}
+      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
+      LLM_MODEL: ${LLM_MODEL:-gemini-2.0-flash}
+      LLM_API_KEY: ${LLM_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-gemini}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-004}
       USE_S3: ${USE_S3:-False}
       AWS_S3_BUCKET: ${AWS_S3_BUCKET}
       AWS_S3_REGION: ${AWS_S3_REGION}
@@ -73,6 +79,7 @@ services:
       dockerfile: Dockerfile
     container_name: prepagent-frontend
     environment:
+      BACKEND_URL: http://backend:8000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
     ports:
       - "3000:3000"

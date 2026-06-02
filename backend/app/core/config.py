@@ -51,7 +51,8 @@ class Settings(BaseSettings):
     AWS_S3_ENDPOINT_URL: Optional[str] = None
 
     # LLM & Embeddings
-    EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
+    EMBEDDING_PROVIDER: str = "openai"
+    EMBEDDING_MODEL: str = "text-embedding-3-small"
     CHUNK_SIZE: int = 500
     CHUNK_OVERLAP: int = 100
 

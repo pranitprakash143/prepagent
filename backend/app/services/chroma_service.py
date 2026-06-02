@@ -2,7 +2,6 @@ import asyncio
 import logging
 import time
 import uuid
-from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Mapping, Optional, Union
 
 import numpy as np
@@ -15,26 +14,11 @@ logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "prepagent_documents"
 
-_executor = ThreadPoolExecutor(max_workers=1)
-_model = None
-
-
-def _get_model():
-    global _model
-    if _model is None:
-        from sentence_transformers import SentenceTransformer
-
-        _model = SentenceTransformer(settings.EMBEDDING_MODEL)
-    return _model
-
-
 async def _embed(texts: List[str]) -> List[List[float]]:
+    from app.services.embedding_service import embed_texts as _api_embed
+
     loop = asyncio.get_event_loop()
-    model = await loop.run_in_executor(_executor, _get_model)
-    embeddings = await loop.run_in_executor(
-        _executor, model.encode, texts, False, None, 64, False
-    )
-    return [emb.tolist() for emb in embeddings]
+    return await loop.run_in_executor(None, _api_embed, texts)
 
 
 async def create_collection_if_needed() -> None:
