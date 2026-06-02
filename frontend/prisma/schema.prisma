@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  tenantId  String
+  email     String   @unique
+  password  String
+  fullName  String?
+  plan      String   @default("FREE")
+  stripeCustomerId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subjects   Subject[]
+  documents  Document[]
+  notes      Note[]
+  flashcards Flashcard[]
+  payments   Payment[]
+}
+
+model Subject {
+  id        String   @id @default(uuid())
+  userId    String
+  tenantId  String
+  name      String
+  color     String   @default("#8b5cf6")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id])
+  documents  Document[]
+  notes      Note[]
+  flashcards Flashcard[]
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  userId    String
+  tenantId  String
+  subjectId String?
+  filename  String
+  status    String   @default("queued")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id])
+  subject Subject? @relation(fields: [subjectId], references: [id])
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  userId    String
+  tenantId  String
+  subjectId String?
+  title     String
+  content   String   @default("")
+  tags      String   @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id])
+  subject Subject? @relation(fields: [subjectId], references: [id])
+}
+
+model Flashcard {
+  id           String   @id @default(uuid())
+  userId       String
+  tenantId     String
+  subjectId    String?
+  noteId       String?
+  documentId   String?
+  question     String
+  answer       String
+  source       String   @default("manual")
+  repetitions  Int      @default(0)
+  intervalDays Int      @default(0)
+  easeFactor   Float    @default(2.5)
+  nextReview   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id])
+  subject Subject? @relation(fields: [subjectId], references: [id])
+}
+
+model Payment {
+  id               String   @id @default(uuid())
+  userId           String
+  tenantId         String
+  provider         String
+  providerPaymentId String?
+  providerOrderId  String?
+  amount           Float
+  currency         String   @default("INR")
+  status           String
+  plan             String?
+  interval         String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}

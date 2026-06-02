@@ -1,0 +1,83 @@
+services:
+  # PostgreSQL database
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: prepagent-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-prepagent}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-prepagent_dev}
+      POSTGRES_DB: ${DB_NAME:-prepagent_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-prepagent}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - prepagent-net
+
+  # Redis cache
+  redis:
+    image: redis:7-alpine
+    container_name: prepagent-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - prepagent-net
+
+  # FastAPI backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: prepagent-backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${DB_USER:-prepagent}:${DB_PASSWORD:-prepagent_dev}@postgres:5432/${DB_NAME:-prepagent_db}
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-in-production}
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+    ports:
+      - "8001:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - prepagent-net
+
+  # Next.js frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: prepagent-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8001}
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/.next
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - prepagent-net
+
+volumes:
+  postgres_data:
+
+networks:
+  prepagent-net:
+    driver: bridge

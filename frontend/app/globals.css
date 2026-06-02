@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --bg: #070a11;
+    --surface: rgba(15, 23, 42, 0.92);
+    --accent: #ef4444;
+    --muted: #94a3b8;
+    --border: rgba(255, 255, 255, 0.08);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply min-h-screen bg-slate-950 text-slate-100;
+    background: radial-gradient(circle at top left, rgba(30, 41, 59, 0.96), rgba(7, 10, 17, 1) 55%);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.6;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button,
+  a,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  .ink-paper {
+    background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.02), transparent 28%),
+      radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.04), transparent 26%),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(7, 10, 17, 0.95));
+  }
+
+  .zen-card {
+    @apply rounded-[2rem] border border-white/10 bg-white/5 shadow-[0_32px_120px_-80px_rgba(0,0,0,0.7)] backdrop-blur-xl;
+  }
+
+  .calligraphy-heading {
+    font-family: "Noto Serif JP", "Yu Mincho", ui-serif, Georgia, serif;
+    letter-spacing: -0.04em;
+    line-height: 1.02;
+  }
+
+  .brush-accent {
+    background-image: linear-gradient(90deg, rgba(239, 68, 68, 0.85), rgba(251, 191, 36, 0.6));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .perspective {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .min-h-screen-dynamic {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .h-screen-dynamic {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .animate-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .slide-in-from-bottom-2 {
+    animation: slide-up 0.3s ease-out;
+  }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-rose-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-500/20 transition duration-200 hover:-translate-y-0.5 hover:bg-rose-400;
+  }
+}
